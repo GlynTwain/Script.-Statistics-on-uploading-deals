@@ -74,13 +74,15 @@ def File_Converter_xls_to_xlsx():
 def File_Saved():
     """Производит сохранение с заданным именем файла + время, и удалением промежуточного файла"""
     global workbook
-    workbook.save("Отчёт по Сделкам (" + modification_date(new_name_file) + ").xlsx")
+    workbook.save("Отчёт. Статистика по Сделкам (" + modification_date(new_name_file) + ").xlsx")
     os.remove("report.xlsx")
+
 
 def modification_date(filename):
     """Записывает дату после создания файла по его свойствам, по свежему так сказать"""
     t = os.path.getmtime(filename)
     return datetime.datetime.fromtimestamp(t).strftime("%d.%m")
+
 
 def File_Format():
     """Форматирует ячейки листа после записи в файл"""
@@ -176,23 +178,17 @@ def Reading_WriterArray():
             number_of_Direction["ЧИ (внутр)"]["Всего поступило"] += 1
             direction_key = "ЧИ (внутр)"
 
-        # print("Расчёт по направлениям" + str(number_of_Direction))
-
         colum = int(my_columns["Андеррайтер"])
         this_cell = sheet.cell(row=i, column=colum).value
 
         if this_cell != empty_cell:
             pole = "Передано в Аналитический отдел"
             number_of_Direction[direction_key][pole] += 1
-            # Подсчёт переданных в Аналитический отдел (по заполнению ячейки)
-        # print("Расчёт по анал отделу" + str(number_of_Direction))
 
         colum = int(my_columns["Дата вынесения на КК"])
         this_cell = sheet.cell(row=i, column=colum).value
         if this_cell != empty_cell:
             number_of_Direction[direction_key]["Вынесены на Кредитный комитет"] += 1
-            # Подсчёт вынесенных на КК (по заполнению ячейки)
-        # print("Расчёт по КК" + str(number_of_Direction))
 
         colum = int(my_columns["Результат (окончательно)"])
         this_cell = sheet.cell(row=i, column=colum).value
@@ -200,27 +196,18 @@ def Reading_WriterArray():
         this_cell = this_cell.lower()
         if this_cell == "одобрено" or this_cell == "положительно" or this_cell == "одобрили":
             number_of_Direction[direction_key]["Одобрено"] += 1
-        # Всего по слову одобрено
-        # print("Расчёт по одобрениям" + str(number_of_Direction))
 
         colum = int(my_columns["Стадия сделки"])
         this_cell = sheet.cell(row=i, column=colum).value
         this_cell = str(this_cell)
         this_cell = this_cell.lower()
+
         if this_cell == "обслуживание" or this_cell == "просрочка" or this_cell == "сделка успешно закрыта":
             number_of_Direction[direction_key]["Выдано"] += 1
-        # Поиск по слома стадии для поля выдано
-        # print("Расчёт по выдачам" + str(number_of_Direction))
-
-        colum = int(my_columns["Вид сделки"])
-        this_cell = sheet.cell(row=i, column=colum).value
-        this_cell = str(this_cell)
-        this_cell = this_cell.lower()
-        if this_cell == "основная":
-            number_of_Direction[direction_key]["Основная"] += 1
-        elif this_cell == "доп. выдача":
-            number_of_Direction[direction_key]["Доп.выдача"] += 1
-        # Поиск по виду сделки для поля вид
+            if sheet.cell(row=i, column=int(my_columns["Вид сделки"])).value == "основная":
+                number_of_Direction[direction_key]["Основная"] += 1
+            elif sheet.cell(row=i, column=int(my_columns["Вид сделки"])).value == "доп. выдача":
+                number_of_Direction[direction_key]["Доп.выдача"] += 1
 
 
 def WriterFile():

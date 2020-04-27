@@ -4,7 +4,7 @@ block_cipher = None
 
 
 a = Analysis(['main.py'],
-             pathex=['D:\\Работа\\Администратор CRM\\script'],
+             pathex=['D:\\Работа\\Администратор CRM\\Script. Statistics on uploading deals'],
              binaries=[],
              datas=[],
              hiddenimports=[],
