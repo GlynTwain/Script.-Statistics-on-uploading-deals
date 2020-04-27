@@ -1,3 +1,4 @@
+import datetime
 import os
 import string
 import openpyxl
@@ -41,16 +42,17 @@ direction_score = 1
 bib = 1
 other_Direction = 0
 sheet = 0
-wb = 0
+workbook = 0
+name_new_sheet = "Отчёт"
 percent_Error = "0 %"
-filenames = "report.xlsx"
+new_name_file = "report.xlsx"
 
 
 def File_Converter_xls_to_xlsx():
     """Конвертирует файл report.xls, импортированный из Битрикс24 в *.xlsx для работы openpyxl"""
-    global wb
+    global workbook
     global sheet
-    global filenames
+    global new_name_file
 
     file = str(os.path.abspath(os.curdir)) + "\\report.xlsx"
     file_old = str(os.path.abspath(os.curdir)) + "\\report.xls"
@@ -63,16 +65,22 @@ def File_Converter_xls_to_xlsx():
     del wbo
     excel.Application.Quit()
 
-    wb = openpyxl.load_workbook(filename=filenames)
-    sheet = wb.active
+    workbook = openpyxl.load_workbook(filename=new_name_file)
+    sheet = workbook.active
 
     Start()
 
 
 def File_Saved():
-    """Производит сохранение с заданным именем файла"""
-    wb.save(filenames)
+    """Производит сохранение с заданным именем файла + время, и удалением промежуточного файла"""
+    global workbook
+    workbook.save("Отчёт по Сделкам (" + modification_date(new_name_file) + ").xlsx")
+    os.remove("report.xlsx")
 
+def modification_date(filename):
+    """Записывает дату после создания файла по его свойствам, по свежему так сказать"""
+    t = os.path.getmtime(filename)
+    return datetime.datetime.fromtimestamp(t).strftime("%d.%m")
 
 def File_Format():
     """Форматирует ячейки листа после записи в файл"""
@@ -93,10 +101,7 @@ def File_Format():
 
 def File_List_Creator():
     """ Создаёт лист внутри нового файла для записи данных"""
-    message = "Отчёт"
-    # date = str(datetime.datetime.now())
-    # title_for_repot = message + date
-    wb.create_sheet(index=1, title=message)
+    workbook.create_sheet(index=1, title=name_new_sheet)
 
 
 def Convertering():
@@ -304,7 +309,7 @@ def Start():
     Convertering()
     Reading_WriterArray()
     File_List_Creator()
-    sheet = wb["Отчёт"]
+    sheet = workbook[name_new_sheet]
     File_Format()
     WriterFile()
     File_Saved()
