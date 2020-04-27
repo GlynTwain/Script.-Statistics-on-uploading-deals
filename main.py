@@ -1,20 +1,18 @@
-import datetime
 import os
 import string
 import openpyxl
 from openpyxl.styles import Alignment
-from openpyxl.workbook import Workbook
 from openpyxl.styles import Font
-import win32com.client
-import win32com
 import win32com.client as win32
 
 """pyinstaller --onefile main.py """
+# Компиляция в main.exe
 
 number_of_Direction = {
     "Фонд / Фонд(рефинанс)": 0,
     "ЧИ (внутр)": 0
-}  # Направления, дальше в них вкладываются стадии
+}
+# Направления, дальше в них вкладываются стадии
 Deal_stades = {
     "Всего поступило": 0,
     "Передано в Аналитический отдел": 0,
@@ -24,7 +22,8 @@ Deal_stades = {
     "Основная": 0,
     "Доп.выдача": 0
 
-}  # Стадии, подсчитывает в них и записывает с них в ячейки
+}
+# Стадии, подсчитывает в них и записывает с них в ячейки
 my_columns = {
     "ID": 0,
     "Вид сделки": 0,
@@ -33,7 +32,8 @@ my_columns = {
     "Андеррайтер": 0,
     "Дата вынесения на КК": 0,
     "Результат (окончательно)": 0
-}  # Названия колонок по которым идёт поиск
+}
+# Названия колонок по которым идёт поиск
 
 percent = " %"
 chop = 0
@@ -47,6 +47,7 @@ filenames = "report.xlsx"
 
 
 def File_Converter_xls_to_xlsx():
+    """Конвертирует файл report.xls, импортированный из Битрикс24 в *.xlsx для работы openpyxl"""
     global wb
     global sheet
     global filenames
@@ -69,10 +70,12 @@ def File_Converter_xls_to_xlsx():
 
 
 def File_Saved():
+    """Производит сохранение с заданным именем файла"""
     wb.save(filenames)
 
 
 def File_Format():
+    """Форматирует ячейки листа после записи в файл"""
     for i in range(1, 31):
         sheet.row_dimensions[i].height = 20
 
@@ -89,6 +92,7 @@ def File_Format():
 
 
 def File_List_Creator():
+    """ Создаёт лист внутри нового файла для записи данных"""
     message = "Отчёт"
     # date = str(datetime.datetime.now())
     # title_for_repot = message + date
@@ -96,11 +100,15 @@ def File_List_Creator():
 
 
 def Convertering():
+    """ Вкладывает словарь в поле значения другого словоря """
+
     for key in number_of_Direction:
         number_of_Direction[key] = dict(Deal_stades)
 
 
 def Reading_Appraiser():
+    """ Производит подсчёт общего числа сделок. Это требуется для корректной работы циклов """
+
     nuuumer = 0
 
     while True:
@@ -117,6 +125,8 @@ def Reading_Appraiser():
 
 
 def Automatic_search_of_the_columns():
+    """ Находит названия столбцов по заданным именам из массива. Сохранет цифрой номер столбца"""
+
     num_columns_w = 0
 
     while True:
@@ -133,6 +143,10 @@ def Automatic_search_of_the_columns():
 
 
 def Reading_WriterArray():
+    """ Для ключевых полей производится подсчёт. Цикл проходит по всем сделкам считывая необходимые ячейки ключчевых столбцов
+    Некторые поля подсчитывают по заполнению, а в ячейках других идёт поиск определённых слов
+    """
+
     print("Metod Reading Writer Array: - Done")
 
     empty_cell = sheet.cell(row=999, column=1).value
@@ -205,6 +219,8 @@ def Reading_WriterArray():
 
 
 def WriterFile():
+    """ Запись Содержимого словарей в файл, расчёт % """
+
     global bib
     sheet.cell(row=1, column=1).value = "Наименование направлений"
     sheet.cell(row=1, column=1).font = Font(bold=True)
@@ -281,11 +297,12 @@ def WriterFile():
 
 
 def Start():
+    """ Скрипт последовательности работы методов. Используется для управления """
+
     global sheet
     Automatic_search_of_the_columns()
     Convertering()
     Reading_WriterArray()
-    print("Расчёт по направлениям ГОТОВ " + str(number_of_Direction))
     File_List_Creator()
     sheet = wb["Отчёт"]
     File_Format()
